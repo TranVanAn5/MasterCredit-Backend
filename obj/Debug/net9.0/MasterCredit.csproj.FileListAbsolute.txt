@@ -169,3 +169,10 @@ C:\Demo\MasterCredit\backend\obj\Debug\net9.0\refint\MasterCredit.dll
 C:\Demo\MasterCredit\backend\obj\Debug\net9.0\MasterCredit.pdb
 C:\Demo\MasterCredit\backend\obj\Debug\net9.0\MasterCredit.genruntimeconfig.cache
 C:\Demo\MasterCredit\backend\obj\Debug\net9.0\ref\MasterCredit.dll
+C:\Demo\MasterCredit\backend\bin\Debug\net9.0\out\web.config
+C:\Demo\MasterCredit\backend\bin\Debug\net9.0\out\appsettings.Development.json
+C:\Demo\MasterCredit\backend\bin\Debug\net9.0\out\appsettings.json
+C:\Demo\MasterCredit\backend\bin\Debug\net9.0\out\MasterCredit.deps.json
+C:\Demo\MasterCredit\backend\bin\Debug\net9.0\out\MasterCredit.runtimeconfig.json
+C:\Demo\MasterCredit\backend\bin\Debug\net9.0\out\MasterCredit.staticwebassets.endpoints.json
+C:\Demo\MasterCredit\backend\obj\Debug\net9.0\MasterCredit.sourcelink.json
