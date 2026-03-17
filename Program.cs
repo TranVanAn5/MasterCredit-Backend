@@ -35,8 +35,10 @@ builder.Services.AddAuthorization();
 // ── CORS ─────────────────────────────────────────────────────
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
-        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+    options.AddPolicy("AllowFrontend", policy =>
+        policy.WithOrigins("https://master-credit-frontend.vercel.app")
+              .AllowAnyMethod()
+              .AllowAnyHeader());
 });
 
 // ── DI – Services ────────────────────────────────────────────
@@ -95,19 +97,18 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
+
 // ── Middleware Pipeline ───────────────────────────────────────
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MasterCredit API v1"));
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
 app.UseStaticFiles();      // phục vụ ảnh CCCD từ wwwroot/uploads
-app.UseCors("AllowAll");
+app.UseRouting();
+app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
