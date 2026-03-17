@@ -15,9 +15,9 @@ namespace backend.Services
         private readonly ILogger<CardService> _logger;
 
         private static readonly string[] _allowedImageExts = { ".jpg", ".jpeg", ".png", ".webp" };
-        private static readonly string[] _allowedDocExts   = { ".jpg", ".jpeg", ".png", ".webp", ".pdf" };
+        private static readonly string[] _allowedDocExts = { ".jpg", ".jpeg", ".png", ".webp", ".pdf" };
         private static readonly string[] _allowedImageMime = { "image/jpeg", "image/jpg", "image/png", "image/webp" };
-        private static readonly string[] _allowedDocMime   = { "image/jpeg", "image/jpg", "image/png", "image/webp", "application/pdf" };
+        private static readonly string[] _allowedDocMime = { "image/jpeg", "image/jpg", "image/png", "image/webp", "application/pdf" };
         private const int MaxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
         private const string OtpType = "CardApply";
 
@@ -27,10 +27,10 @@ namespace backend.Services
             IWebHostEnvironment env,
             ILogger<CardService> logger)
         {
-            _db           = db;
+            _db = db;
             _emailService = emailService;
-            _env          = env;
-            _logger       = logger;
+            _env = env;
+            _logger = logger;
         }
 
         // ════════════════════════════════════════════════════════════════
@@ -47,12 +47,12 @@ namespace backend.Services
 
             var result = cards.Select(c => new CardDto
             {
-                Id         = c.Id,
+                Id = c.Id,
                 CardNumber = MaskCardNumber(c.CardNumber),
                 ExpiryDate = $"{c.ExpiryDate.Month:D2}/{c.ExpiryDate.Year % 100:D2}",
                 CardStatus = c.CardStatus,
                 HolderName = c.User.Name,
-                CardType   = MapCardType(c.CardType)
+                CardType = MapCardType(c.CardType)
             }).ToList();
 
             return ApiResponse<List<CardDto>>.Ok("Lấy danh sách thẻ thành công.", result);
@@ -130,16 +130,16 @@ namespace backend.Services
             // Create draft application
             var application = new CardApplication
             {
-                UserId            = userId,
-                CardTypeId        = dto.CardTypeId,
+                UserId = userId,
+                CardTypeId = dto.CardTypeId,
                 GrossAnnualIncome = dto.GrossAnnualIncome,
-                IncomeSource      = dto.IncomeSource.Trim(),
-                Occupation        = dto.Occupation.Trim(),
-                CompanyName       = dto.CompanyName.Trim(),
-                IdCardPath        = string.Empty,
-                SalarySlipPath    = string.Empty,
-                Status            = "Draft",
-                ApplicationDate   = DateTime.UtcNow
+                IncomeSource = dto.IncomeSource.Trim(),
+                Occupation = dto.Occupation.Trim(),
+                CompanyName = dto.CompanyName.Trim(),
+                IdCardPath = string.Empty,
+                SalarySlipPath = string.Empty,
+                Status = "Draft",
+                ApplicationDate = DateTime.UtcNow
             };
 
             _db.CardApplications.Add(application);
@@ -168,7 +168,7 @@ namespace backend.Services
                 return ApiResponse<ApplicationReviewDto>.Fail("Đơn đăng ký đã được nộp, không thể thay đổi giấy tờ.");
 
             // Validate files
-            var idVal   = ValidateFile(idCard,   "Ảnh CCCD",    _allowedImageExts, _allowedImageMime);
+            var idVal = ValidateFile(idCard, "Ảnh CCCD", _allowedImageExts, _allowedImageMime);
             if (!idVal.ok) return ApiResponse<ApplicationReviewDto>.Fail(idVal.error);
 
             var slipVal = ValidateFile(salarySlip, "Bảng lương", _allowedDocExts, _allowedDocMime);
@@ -182,7 +182,7 @@ namespace backend.Services
             var uploadDir = Path.Combine(_env.WebRootPath, "uploads", "card-applications", userId.ToString());
             Directory.CreateDirectory(uploadDir);
 
-            app.IdCardPath     = await SaveFileAsync(idCard,    uploadDir, $"{userId}_{applicationId}_idcard");
+            app.IdCardPath = await SaveFileAsync(idCard, uploadDir, $"{userId}_{applicationId}_idcard");
             app.SalarySlipPath = await SaveFileAsync(salarySlip, uploadDir, $"{userId}_{applicationId}_salary");
 
             await _db.SaveChangesAsync();
@@ -260,33 +260,49 @@ namespace backend.Services
                         .ToListAsync();
                     _db.OTPs.RemoveRange(oldOtps);
 
-                    var otpCode = GenerateSecureOtpCode();
+                    var otpCode = "123456"; // 👉 HARD CODE
+
                     _db.OTPs.Add(new OTP
                     {
-                        UserId     = userId,
-                        OTPCode    = otpCode,
-                        OTPType    = OtpType,
+                        UserId = userId,
+                        OTPCode = otpCode,
+                        OTPType = OtpType,
                         ExpiryTime = DateTime.UtcNow.AddMinutes(5),
-                        IsUsed     = false
+                        IsUsed = false
                     });
-                    await _db.SaveChangesAsync();
 
-                    if (dto.Type == "email")
-                    {
-                        await _emailService.SendOtpEmailAsync(user.Email, user.Name, otpCode, OtpType);
-                        await transaction.CommitAsync();
-                        return ApiResponse<string>.Ok(
-                            $"Mã OTP đã được gửi đến email {MaskEmail(user.Email)}. Mã có hiệu lực trong 5 phút.");
-                    }
-                    else // phone
-                    {
-                        // In production: integrate SMS provider (Twilio, Vonage, etc.)
-                        _logger.LogInformation("SMS OTP for user {UserId} application {AppId}: {Code}",
-                            userId, applicationId, otpCode);
-                        await transaction.CommitAsync();
-                        return ApiResponse<string>.Ok(
-                            $"Mã OTP đã được gửi đến số điện thoại {MaskPhone(user.PhoneNumber)}. Mã có hiệu lực trong 5 phút.");
-                    }
+                    await _db.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return ApiResponse<string>.Ok($"OTP demo: 123456");
+
+                    // var otpCode = GenerateSecureOtpCode();
+                    // _db.OTPs.Add(new OTP
+                    // {
+                    //     UserId = userId,
+                    //     OTPCode = otpCode,
+                    //     OTPType = OtpType,
+                    //     ExpiryTime = DateTime.UtcNow.AddMinutes(5),
+                    //     IsUsed = false
+                    // });
+                    // await _db.SaveChangesAsync();
+
+                    // if (dto.Type == "email")
+                    // {
+                    //     await _emailService.SendOtpEmailAsync(user.Email, user.Name, otpCode, OtpType);
+                    //     await transaction.CommitAsync();
+                    //     return ApiResponse<string>.Ok(
+                    //         $"Mã OTP đã được gửi đến email {MaskEmail(user.Email)}. Mã có hiệu lực trong 5 phút.");
+                    // }
+                    // else // phone
+                    // {
+                    //     // In production: integrate SMS provider (Twilio, Vonage, etc.)
+                    //     _logger.LogInformation("SMS OTP for user {UserId} application {AppId}: {Code}",
+                    //         userId, applicationId, otpCode);
+                    //     await transaction.CommitAsync();
+                    //     return ApiResponse<string>.Ok(
+                    //         $"Mã OTP đã được gửi đến số điện thoại {MaskPhone(user.PhoneNumber)}. Mã có hiệu lực trong 5 phút.");
+                    // }
                 }
                 catch
                 {
@@ -326,19 +342,19 @@ namespace backend.Services
 
             // Verify OTP
             var otp = await _db.OTPs.FirstOrDefaultAsync(o =>
-                o.UserId   == userId        &&
-                o.OTPCode  == dto.OtpCode   &&
-                o.OTPType  == OtpType       &&
-                !o.IsUsed                   &&
+                o.UserId == userId &&
+                o.OTPCode == dto.OtpCode &&
+                o.OTPType == OtpType &&
+                !o.IsUsed &&
                 o.ExpiryTime > DateTime.UtcNow);
 
             if (otp == null)
                 return ApiResponse<CardApplicationResponseDto>.Fail("Mã OTP không hợp lệ hoặc đã hết hạn.");
 
             // Mark OTP used + auto-approve application + create card
-            otp.IsUsed           = true;
-            app.Status           = "Approved";
-            app.ApplicationDate  = DateTime.UtcNow;
+            otp.IsUsed = true;
+            app.Status = "Approved";
+            app.ApplicationDate = DateTime.UtcNow;
 
             // Auto create card from approved application
             var card = await CreateCardFromApplicationAsync(app);
@@ -350,10 +366,10 @@ namespace backend.Services
                 new CardApplicationResponseDto
                 {
                     ApplicationId = app.Id,
-                    CardTypeName  = app.CardType.CardName,
-                    Status        = app.Status,
-                    Message       = $"Thẻ {app.CardType.CardName} đã được cấp thành công. Số thẻ: {MaskCardNumber(card.CardNumber)}",
-                    SubmittedAt   = app.ApplicationDate
+                    CardTypeName = app.CardType.CardName,
+                    Status = app.Status,
+                    Message = $"Thẻ {app.CardType.CardName} đã được cấp thành công. Số thẻ: {MaskCardNumber(card.CardNumber)}",
+                    SubmittedAt = app.ApplicationDate
                 });
         }
 
@@ -370,10 +386,10 @@ namespace backend.Services
                 .Select(a => new CardApplicationResponseDto
                 {
                     ApplicationId = a.Id,
-                    CardTypeName  = a.CardType.CardName,
-                    Status        = a.Status,
-                    Message       = $"Đơn đăng ký thẻ {a.CardType.CardName}",
-                    SubmittedAt   = a.ApplicationDate
+                    CardTypeName = a.CardType.CardName,
+                    Status = a.Status,
+                    Message = $"Đơn đăng ký thẻ {a.CardType.CardName}",
+                    SubmittedAt = a.ApplicationDate
                 })
                 .ToListAsync();
 
@@ -441,28 +457,28 @@ namespace backend.Services
 
         private static CardTypeInfoDto MapCardType(CardType ct) => new()
         {
-            Id           = ct.Id,
-            CardName     = ct.CardName,
-            CardNetwork  = ct.CardNetwork,
-            CreditLimit  = ct.CreditLimit,
-            AnnualFee    = ct.AnnualFee,
+            Id = ct.Id,
+            CardName = ct.CardName,
+            CardNetwork = ct.CardNetwork,
+            CreditLimit = ct.CreditLimit,
+            AnnualFee = ct.AnnualFee,
             CashbackRate = ct.CashbackRate,
-            Description  = ct.Description,
-            ImageUrl     = ct.ImageUrl ?? string.Empty
+            Description = ct.Description,
+            ImageUrl = ct.ImageUrl ?? string.Empty
         };
 
         private static ApplicationReviewDto BuildReviewDto(CardApplication app, CardType ct) => new()
         {
-            ApplicationId     = app.Id,
-            Status            = app.Status,
-            CardType          = MapCardType(ct),
+            ApplicationId = app.Id,
+            Status = app.Status,
+            CardType = MapCardType(ct),
             GrossAnnualIncome = app.GrossAnnualIncome,
-            IncomeSource      = app.IncomeSource,
-            Occupation        = app.Occupation,
-            CompanyName       = app.CompanyName,
-            IdCardPath        = string.IsNullOrEmpty(app.IdCardPath)     ? null : app.IdCardPath,
-            SalarySlipPath    = string.IsNullOrEmpty(app.SalarySlipPath) ? null : app.SalarySlipPath,
-            CreatedAt         = app.ApplicationDate
+            IncomeSource = app.IncomeSource,
+            Occupation = app.Occupation,
+            CompanyName = app.CompanyName,
+            IdCardPath = string.IsNullOrEmpty(app.IdCardPath) ? null : app.IdCardPath,
+            SalarySlipPath = string.IsNullOrEmpty(app.SalarySlipPath) ? null : app.SalarySlipPath,
+            CreatedAt = app.ApplicationDate
         };
 
         private static (bool ok, string error) ValidateFile(
@@ -486,7 +502,7 @@ namespace backend.Services
 
         private async Task<string> SaveFileAsync(IFormFile file, string directory, string baseName)
         {
-            var ext      = Path.GetExtension(file.FileName.ToLowerInvariant());
+            var ext = Path.GetExtension(file.FileName.ToLowerInvariant());
             var fileName = $"{baseName}_{Guid.NewGuid()}{ext}";
             var fullPath = Path.Combine(directory, fileName);
 

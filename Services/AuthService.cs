@@ -52,10 +52,10 @@ namespace backend.Services
                     PhoneNumber = dto.PhoneNumber,
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                     RoleId = 1,
-                    // IsEmailVerified = false,
-                    // IsActive = false,
-                    IsEmailVerified = true, // 👉 TESTING PURPOSES ONLY
-                    IsActive = true, // 👉 TESTING PURPOSES ONLY
+                    IsEmailVerified = false,
+                    IsActive = false,
+                    // IsEmailVerified = true, // 👉 TESTING PURPOSES ONLY
+                    // IsActive = true, // 👉 TESTING PURPOSES ONLY
                     CreatedAt = DateTime.UtcNow
                 };
 
@@ -88,7 +88,9 @@ namespace backend.Services
                 return ApiResponse<object>.Fail("Email không tồn tại.");
 
             if (user.IsEmailVerified)
-                return ApiResponse<object>.Fail("Email đã được xác thực trước đó.");
+            {
+                return ApiResponse<object>.Ok("Email đã xác thực rồi, tiếp tục bước sau.");
+            }
 
             var valid = await ValidateOtpAsync(user.Id, dto.OtpCode, "Register");
             if (!valid)
