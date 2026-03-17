@@ -52,8 +52,10 @@ namespace backend.Services
                     PhoneNumber = dto.PhoneNumber,
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                     RoleId = 1,
-                    IsEmailVerified = false,
-                    IsActive = false,
+                    // IsEmailVerified = false,
+                    // IsActive = false,
+                    IsEmailVerified = true, // 👉 TESTING PURPOSES ONLY
+                    IsActive = true, // 👉 TESTING PURPOSES ONLY
                     CreatedAt = DateTime.UtcNow
                 };
 
@@ -62,7 +64,7 @@ namespace backend.Services
 
                 await SendOtpAsync(user, "Register");
 
-                return ApiResponse<object>.Ok("Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.");
+                return ApiResponse<object>.Ok($"OTP demo: 123456", new { Email = user.Email });
             }
             catch (InvalidOperationException ex)
             {
@@ -201,7 +203,8 @@ namespace backend.Services
 
                 await SendOtpAsync(user, "Login");
 
-                return ApiResponse<object>.Ok($"Mã OTP đã được gửi đến email {MaskEmail(user.Email)}. Vui lòng kiểm tra hộp thư.", new { Email = user.Email });
+                // return ApiResponse<object>.Ok($"Mã OTP đã được gửi đến email {MaskEmail(user.Email)}. Vui lòng kiểm tra hộp thư.", new { Email = user.Email });
+                return ApiResponse<object>.Ok($"OTP demo: 123456", new { Email = user.Email });
             }
             catch (InvalidOperationException ex)
             {
@@ -271,7 +274,7 @@ namespace backend.Services
             try
             {
                 await SendOtpAsync(user, dto.OtpType);
-                return ApiResponse<object>.Ok("Mã OTP mới đã được gửi đến email của bạn.");
+                return ApiResponse<object>.Ok("OTP demo: 123456");
             }
             catch (Exception ex)
             {
@@ -284,23 +287,72 @@ namespace backend.Services
         // PRIVATE HELPERS
         // =========================================================
 
+        // private async Task SendOtpAsync(User user, string otpType)
+        // {
+        //     try
+        //     {
+        //         // Use transaction to ensure atomicity and prevent race conditions
+        //         using var transaction = await _db.Database.BeginTransactionAsync();
+
+        //         try
+        //         {
+        //             // Remove old unused OTPs of the same type
+        //             var oldOtps = await _db.OTPs
+        //                 .Where(o => o.UserId == user.Id && o.OTPType == otpType && !o.IsUsed)
+        //                 .ToListAsync();
+        //             _db.OTPs.RemoveRange(oldOtps);
+
+        //             // Generate secure random OTP
+        //             // var otpCode = GenerateSecureOtpCode();
+        //             var otpCode = "123456";
+        //             var newOtp = new OTP
+        //             {
+        //                 OTPCode = otpCode,
+        //                 OTPType = otpType,
+        //                 ExpiryTime = DateTime.UtcNow.AddMinutes(5),
+        //                 IsUsed = false,
+        //                 UserId = user.Id
+        //             };
+
+        //             _db.OTPs.Add(newOtp);
+        //             await _db.SaveChangesAsync();
+
+        //             // Try to send email - if this fails, rollback the transaction
+        //             // await _emailService.SendOtpEmailAsync(user.Email, user.Name, otpCode, otpType);
+        //             return ApiResponse<object>.Ok("OTP test: 123456");
+
+        //             await transaction.CommitAsync();
+        //         }
+        //         catch
+        //         {
+        //             await transaction.RollbackAsync();
+        //             throw;
+        //         }
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         _logger.LogError(ex, "Failed to send OTP for user {UserId}, type {OtpType}", user.Id, otpType);
+        //         throw new InvalidOperationException("Không thể gửi mã OTP. Vui lòng thử lại.");
+        //     }
+        // }
         private async Task SendOtpAsync(User user, string otpType)
         {
             try
             {
-                // Use transaction to ensure atomicity and prevent race conditions
                 using var transaction = await _db.Database.BeginTransactionAsync();
 
                 try
                 {
-                    // Remove old unused OTPs of the same type
+                    // Xóa OTP cũ
                     var oldOtps = await _db.OTPs
                         .Where(o => o.UserId == user.Id && o.OTPType == otpType && !o.IsUsed)
                         .ToListAsync();
+
                     _db.OTPs.RemoveRange(oldOtps);
 
-                    // Generate secure random OTP
-                    var otpCode = GenerateSecureOtpCode();
+                    // 👉 HARD CODE OTP
+                    var otpCode = "123456";
+
                     var newOtp = new OTP
                     {
                         OTPCode = otpCode,
@@ -313,10 +365,7 @@ namespace backend.Services
                     _db.OTPs.Add(newOtp);
                     await _db.SaveChangesAsync();
 
-                    // Try to send email - if this fails, rollback the transaction
-                    await _emailService.SendOtpEmailAsync(user.Email, user.Name, otpCode, otpType);
-
-                    await transaction.CommitAsync();
+                    await transaction.CommitAsync(); // ✅ QUAN TRỌNG
                 }
                 catch
                 {
@@ -326,8 +375,8 @@ namespace backend.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to send OTP for user {UserId}, type {OtpType}", user.Id, otpType);
-                throw new InvalidOperationException("Không thể gửi mã OTP. Vui lòng thử lại.");
+                _logger.LogError(ex, "Failed to send OTP");
+                throw new InvalidOperationException("Không thể tạo OTP.");
             }
         }
 
