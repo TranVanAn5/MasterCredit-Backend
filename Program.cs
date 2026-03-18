@@ -56,6 +56,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICardService, CardService>();
 builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IBillPaymentService, BillPaymentService>();
 
 // ── Controllers ──────────────────────────────────────────────
 builder.Services.AddControllers();
