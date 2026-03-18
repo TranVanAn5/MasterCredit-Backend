@@ -7,7 +7,17 @@ using backend.Data;
 using backend.Interfaces;
 using backend.Services;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    ContentRootPath = Directory.GetCurrentDirectory(),
+    EnvironmentName = Environments.Production // ép production mode
+});
+// 🔥 FIX inotify crash
+builder.Configuration.Sources.Clear();
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+    .AddEnvironmentVariables();
 
 // ── Database ────────────────────────────────────────────────
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -20,13 +30,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer           = true,
-            ValidateAudience         = true,
-            ValidateLifetime         = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer              = builder.Configuration["Jwt:Issuer"],
-            ValidAudience            = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey         = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
     });
 
@@ -56,7 +66,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title   = "MasterCredit API",
+        Title = "MasterCredit API",
         Version = "v1",
         Description = "API quản lý thẻ tín dụng MasterCredit"
     });
@@ -64,12 +74,12 @@ builder.Services.AddSwaggerGen(c =>
     // Thêm JWT Authorization vào Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Name         = "Authorization",
-        Type         = SecuritySchemeType.Http,
-        Scheme       = "Bearer",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
         BearerFormat = "JWT",
-        In           = ParameterLocation.Header,
-        Description  = "Nhập JWT token: Bearer {token}"
+        In = ParameterLocation.Header,
+        Description = "Nhập JWT token: Bearer {token}"
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
