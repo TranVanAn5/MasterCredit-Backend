@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Demo\\MasterCredit-Backend\\MasterCredit.csproj": {}
+    "C:\\Demo\\MasterCredit\\backend\\MasterCredit.csproj": {}
   },
   "projects": {
-    "D:\\Demo\\MasterCredit-Backend\\MasterCredit.csproj": {
+    "C:\\Demo\\MasterCredit\\backend\\MasterCredit.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Demo\\MasterCredit-Backend\\MasterCredit.csproj",
+        "projectUniqueName": "C:\\Demo\\MasterCredit\\backend\\MasterCredit.csproj",
         "projectName": "MasterCredit",
-        "projectPath": "D:\\Demo\\MasterCredit-Backend\\MasterCredit.csproj",
-        "packagesPath": "C:\\Users\\tranv\\.nuget\\packages\\",
-        "outputPath": "D:\\Demo\\MasterCredit-Backend\\obj\\",
+        "projectPath": "C:\\Demo\\MasterCredit\\backend\\MasterCredit.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "C:\\Demo\\MasterCredit\\backend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\tranv\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -68,7 +68,7 @@
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[9.0.3, )"
+              "version": "[9.0.0, )"
             },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
@@ -78,7 +78,7 @@
             },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
-              "version": "[9.0.3, )"
+              "version": "[9.0.0, )"
             },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
@@ -110,7 +110,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.311/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.312/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
