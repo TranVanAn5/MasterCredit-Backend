@@ -286,6 +286,42 @@ namespace backend.Services
         }
 
         // =========================================================
+        // PROFILE
+        // =========================================================
+        public async Task<ApiResponse<UserProfileDto>> GetProfileAsync(int userId)
+        {
+            try
+            {
+                var user = await _db.Users.Include(u => u.Role)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user == null)
+                    return ApiResponse<UserProfileDto>.Fail("Người dùng không tồn tại.");
+
+                var profile = new UserProfileDto
+                {
+                    Id = user.Id,
+                    Name = user.Name,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    CitizenImgFront = user.CitizenImgFront,
+                    CitizenImgBack = user.CitizenImgBack,
+                    IsEmailVerified = user.IsEmailVerified,
+                    IsActive = user.IsActive,
+                    CreatedAt = user.CreatedAt,
+                    Role = user.Role?.Name ?? "User"
+                };
+
+                return ApiResponse<UserProfileDto>.Ok("Lấy thông tin profile thành công.", profile);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting profile for user {UserId}", userId);
+                return ApiResponse<UserProfileDto>.Fail("Đã có lỗi xảy ra khi lấy thông tin profile.");
+            }
+        }
+
+        // =========================================================
         // PRIVATE HELPERS
         // =========================================================
 

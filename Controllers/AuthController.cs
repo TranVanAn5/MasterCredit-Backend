@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using backend.DTOs;
 using backend.Interfaces;
 
@@ -134,6 +136,31 @@ namespace backend.Controllers
                 return BadRequest(ModelState);
 
             var result = await _authService.ResendOtpAsync(dto);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+
+        // =====================================================
+        // PROFILE
+        // =====================================================
+
+        /// <summary>
+        /// Lấy thông tin profile của user hiện tại (yêu cầu JWT token).
+        /// </summary>
+        [Authorize]
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetProfile()
+        {
+            // Lấy userId từ JWT token claims
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+                return Unauthorized(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Token không hợp lệ."
+                });
+
+            var result = await _authService.GetProfileAsync(userId);
             return result.Success ? Ok(result) : BadRequest(result);
         }
     }

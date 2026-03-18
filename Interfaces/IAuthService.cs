@@ -14,6 +14,9 @@ namespace backend.Interfaces
         Task<ApiResponse<object>> LoginAsync(LoginDto dto);
         Task<ApiResponse<LoginResponseDto>> VerifyLoginOtpAsync(VerifyOtpDto dto);
 
+        // Profile
+        Task<ApiResponse<UserProfileDto>> GetProfileAsync(int userId);
+
         // Shared
         Task<ApiResponse<object>> ResendOtpAsync(ResendOtpDto dto);
     }
