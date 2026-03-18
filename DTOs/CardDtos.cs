@@ -22,6 +22,18 @@ namespace backend.DTOs
         public CardTypeInfoDto CardType { get; set; } = null!;
     }
 
+    public class CardDetailDto
+    {
+        public int Id { get; set; }
+        public string CardNumber { get; set; } = string.Empty;  // Full card number (16 digits)
+        public string CVV { get; set; } = string.Empty;
+        public string ExpiryDate { get; set; } = string.Empty;  // MM/YY
+        public string CardStatus { get; set; } = string.Empty;
+        public string HolderName { get; set; } = string.Empty;
+        public CardTypeInfoDto CardType { get; set; } = null!;
+        public DateTime IssuedDate { get; set; }
+    }
+
     // ─────────────────────────────────────────────────────────
     // CARD APPLICATION - MULTI-STEP FLOW
     // ─────────────────────────────────────────────────────────

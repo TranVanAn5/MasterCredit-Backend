@@ -58,6 +58,35 @@ namespace backend.Services
             return ApiResponse<List<CardDto>>.Ok("Lấy danh sách thẻ thành công.", result);
         }
 
+        public async Task<ApiResponse<CardDetailDto>> GetCardDetailAsync(int userId, int cardId)
+        {
+            var card = await _db.Cards
+                .Include(c => c.CardType)
+                .Include(c => c.User)
+                .FirstOrDefaultAsync(c => c.Id == cardId);
+
+            if (card == null)
+                return ApiResponse<CardDetailDto>.Fail("Không tìm thấy thẻ.");
+
+            // Check if the card belongs to the user
+            if (card.UserId != userId)
+                return ApiResponse<CardDetailDto>.Fail("Bạn không có quyền xem thông tin thẻ này.");
+
+            var result = new CardDetailDto
+            {
+                Id = card.Id,
+                CardNumber = card.CardNumber, // Full card number
+                CVV = card.CVV,
+                ExpiryDate = $"{card.ExpiryDate.Month:D2}/{card.ExpiryDate.Year % 100:D2}",
+                CardStatus = card.CardStatus,
+                HolderName = card.User.Name,
+                CardType = MapCardType(card.CardType),
+                IssuedDate = DateTime.UtcNow.AddMonths(-6) // Mock issued date - replace with actual field if available
+            };
+
+            return ApiResponse<CardDetailDto>.Ok("Lấy chi tiết thẻ thành công.", result);
+        }
+
         public async Task<ApiResponse<List<CardTypeInfoDto>>> GetAllCardTypesAsync()
         {
             var types = await _db.CardTypes

@@ -7,6 +7,7 @@ namespace backend.Interfaces
     {
         // ── Catalog ──────────────────────────────────────────────────────
         Task<ApiResponse<List<CardDto>>> GetUserCardsAsync(int userId);
+        Task<ApiResponse<CardDetailDto>> GetCardDetailAsync(int userId, int cardId);
         Task<ApiResponse<List<CardTypeInfoDto>>> GetAllCardTypesAsync();
         Task<ApiResponse<List<CardTypeInfoDto>>> CompareCardTypesAsync(List<int> cardTypeIds);
         Task<ApiResponse<CardTypeInfoDto>> GetCardTypeByIdAsync(int cardTypeId);

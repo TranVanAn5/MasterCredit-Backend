@@ -52,6 +52,15 @@ namespace backend.Controllers
             return Ok(await _cardService.GetUserCardsAsync(userId));
         }
 
+        /// <summary>Lấy chi tiết thông tin của một thẻ cụ thể (bao gồm CVV và số thẻ đầy đủ).</summary>
+        [HttpGet("{cardId:int}")]
+        public async Task<IActionResult> GetCardDetail(int cardId)
+        {
+            if (!TryGetUserId(out var userId)) return Unauthorized();
+            var result = await _cardService.GetCardDetailAsync(userId, cardId);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+
         // ════════════════════════════════════════════════════════════════
         //  CARD APPLICATION – 7-STEP FLOW (requires auth)
         // ════════════════════════════════════════════════════════════════
